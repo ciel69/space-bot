@@ -8,7 +8,6 @@ build:
   artifacts:
     "*": /
 run:
-  scriptName: index.js
   command: npm run build && npm run prod
   persistenceMount: /data
   containerPort: 3000
