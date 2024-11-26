@@ -43,6 +43,7 @@ onBeforeMount(async () => {
   </p>
   <p class="read-the-docs">Click on the Vite and Vue logos to learn more</p>
   <div ref="field" class="field-play"></div>
+
 </template>
 
 <style scoped>
