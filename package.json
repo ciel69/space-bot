@@ -7,7 +7,7 @@
     "copy:assets": "copyfiles -u 4 --all apps/web/dist/assets/* apps/api2/dist/client/assets",
     "dev": "turbo dev",
     "lint": "turbo lint",
-    "prod": "cd apps/api2 && npm run start:prod",
+    "prod": "cd apps/api && npm run start:prod",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
