@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "build": "turbo build && npm run copy",
+    "build": "turbo build",
     "copy": "npm run copy:web && npm run copy:assets",
     "copy:web": "copyfiles -u 3 --all apps/web/dist/* apps/api/dist/client/",
     "copy:assets": "copyfiles -u 4 --all apps/web/dist/assets/* apps/api/dist/client/assets",
