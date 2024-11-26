@@ -62,7 +62,7 @@ onBeforeMount(async () => {
       <button type="button" @click="count++">count is {{ count }}</button>
       <p>
         Edit
-        <code>components/HelloWorld.vue</code> to test HMR2
+        <code>components/HelloWorld.vue</code> to test HMR
       </p>
     </div>
 
@@ -91,6 +91,9 @@ onBeforeMount(async () => {
 .header {
   position: absolute;
   width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 .logo {
   height: 6em;
