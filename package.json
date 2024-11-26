@@ -2,6 +2,7 @@
   "private": true,
   "scripts": {
     "build": "turbo build",
+    "deploy": "npm i && turbo build && npm run prod",
     "copy": "npm run copy:web && npm run copy:assets",
     "copy:web": "copyfiles -u 3 --all apps/web/dist/* apps/api2/dist/client/",
     "copy:assets": "copyfiles -u 4 --all apps/web/dist/assets/* apps/api2/dist/client/assets",
