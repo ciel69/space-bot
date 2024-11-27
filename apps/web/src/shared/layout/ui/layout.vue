@@ -1,5 +1,4 @@
 <script setup lang="ts">
-  import { Navigation } from '@/shared/navigation'
 </script>
 
 <template>
@@ -8,7 +7,7 @@
       <slot />
     </div>
     <div class="layout-navigation">
-      <Navigation />
+      <slot name="navigation" />
     </div>
   </div>
 </template>
