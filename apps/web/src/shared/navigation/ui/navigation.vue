@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <div>navigation 2</div>
+  <div>navigation</div>
 </template>
 
 <style scoped>
