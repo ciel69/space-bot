@@ -5,10 +5,12 @@ import { isErrorOfType, parse, validate } from '@telegram-apps/init-data-node';
 export class TelegramController {
   @Post('auth')
   validateTelegramData(@Body() body: { initData: string }) {
+    console.log('initData', body.initData);
     const token = process.env.TELEGRAM_BOT_TOKEN;
     try {
       validate(body.initData, token);
       const data = parse(body.initData);
+      console.log('data', data);
       return {
         success: true,
         userId: data.user.id,
