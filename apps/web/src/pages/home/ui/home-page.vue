@@ -13,7 +13,7 @@
 
   const sendAuthData = async () => {
     try {
-      const response = await axios.post('http://localhost:3000/api/telegram/auth', { initData: initDataRaw })
+      const response = await axios.post('/api/telegram/auth', { initData: initDataRaw })
       console.log(response.data) // Результат валидации
       dataRes.value = response.data
     } catch (error) {
