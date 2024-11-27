@@ -1,10 +1,8 @@
 <script setup lang="ts">
-  import { parseInitData } from '@telegram-apps/sdk-vue'
+  import { initData } from '@telegram-apps/sdk-vue'
   import { Layout } from '@/shared/layout'
   import { GameBoard } from '@/widgets/game-board'
   import { Navigation } from '@/shared/navigation'
-
-  const initData = parseInitData(null)
 </script>
 
 <template>
