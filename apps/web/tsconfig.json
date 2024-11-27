@@ -1,4 +1,9 @@
 {
-  "extends": "@repo/typescript-config/vite.json",
-  "include": ["src"]
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "files":[],
+  "references": [
+    { "path": "./tsconfig.root.json"},
+    { "path": "./tsconfig.node.json"}
+  ],
+  "exclude": ["scripts"]
 }

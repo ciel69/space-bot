@@ -29,10 +29,11 @@ body {
   margin: 0;
   display: flex;
   place-items: center;
-  width: 100%;
   min-width: 320px;
   min-height: 100vh;
   position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 h1 {
@@ -64,11 +65,11 @@ button:focus-visible {
 }
 
 #app {
-  /*max-width: 1280px;*/
   margin: 0 auto;
-  /*padding: 2rem;*/
   text-align: center;
   position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 @media (prefers-color-scheme: light) {

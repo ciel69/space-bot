@@ -7,8 +7,8 @@ import { fileURLToPath, URL } from 'node:url'
 export default defineConfig({
   plugins: [vue(), eslintPlugin()],
   resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-    },
+    alias: [
+      { find: '@', replacement: fileURLToPath(new URL('./src', import.meta.url)) },
+    ],
   },
 })
