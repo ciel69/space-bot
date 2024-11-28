@@ -9,7 +9,8 @@ init()
 export const app = createApp(App).use(router)
 backButton.mount()
 initData.restore()
-if (swipeBehavior.disableVertical.isAvailable()) {
+
+if (swipeBehavior.mount.isAvailable()) {
+    swipeBehavior.mount()
     swipeBehavior.disableVertical()
-    swipeBehavior.isVerticalEnabled() // false
 }
