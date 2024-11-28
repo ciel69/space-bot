@@ -36,10 +36,13 @@
     for (let x = 0; x < gridSize; x++) {
       for (let y = 0; y < gridSize; y++) {
         // Рисуем каждую ячейку с отдельным стилем
-        grid.lineStyle(2, 0xffffff, 1) // Белые линии для границ
-        grid.beginFill(0x2d2d2d) // Тёмно-серый фон ячейки
-        grid.drawRect(x * cellSize, y * cellSize, cellSize, cellSize)
-        grid.endFill() // Завершаем заполнение текущей ячейки
+        grid.rect(x * cellSize, y * cellSize, cellSize, cellSize)
+        grid.fill(0x2d2d2d) // Тёмно-серый фон ячейки
+        grid.stroke({
+          width: 2,
+          color: 0xffffff,
+          alpha: 0.4,
+        }) // Белые линии для границ
       }
     }
 
@@ -65,42 +68,34 @@
    */
   const animateProjectile = (projectile: Graphics, direction: 'left' | 'right') => {
     const speed = 5
-    const deviationAngle = (Math.random() * 0.4) - 0.2 // Отклонение траектории от -0.2 до 0.2 (меньше)
+    const deviationAngle = (Math.random() * 0.4) - 0.2 // Отклонение траектории
 
     const move = () => {
       if (!projectile || !app) return
 
-      // Движение с меньшим отклонением
-      const deviationX = Math.sin(deviationAngle) * 0.5 // Меньшее отклонение по оси X
-      const deviationY = Math.cos(deviationAngle) * 0.15 // Меньшее отклонение по оси Y
+      // Движение снаряда
+      const deviationX = Math.sin(deviationAngle) * 0.5
+      const deviationY = Math.cos(deviationAngle) * 0.15
 
-      projectile.x += ((direction === 'right') ? speed : -speed) + deviationX
+      projectile.x += (direction === 'right' ? speed : -speed) + deviationX
       projectile.y += deviationY
 
-      // Проверка на попадание в вражеский корабль
+      // Проверка на попадание
       // eslint-disable-next-line no-restricted-syntax
-      for (const enemyShip of enemyShips) {
+      for (const enemyShip of [...enemyShips, ...friendlyShips]) {
         if (checkCollision(projectile, enemyShip)) {
-          app.stage.removeChild(projectile) // Удаляем снаряд при попадании
-          break
-        }
-      }
-      // eslint-disable-next-line no-restricted-syntax
-      for (const friendlyShip of friendlyShips) {
-        if (checkCollision(projectile, friendlyShip)) {
-          app.stage.removeChild(projectile) // Удаляем снаряд при попадании
-          break
+          app.stage.removeChild(projectile) // Удаляем снаряд
+          return // Завершаем обработку снаряда
         }
       }
 
-      // Удаление снаряда, если он вышел за пределы поля
-      if ((projectile.x < 0) || (projectile.x > app.view.width) || (projectile.y < 0) || (projectile.y > app.view.height)) {
+      // Удаление снаряда за пределами поля
+      if (projectile.x < 0 || projectile.x > app.canvas.width || projectile.y < 0 || projectile.y > app.canvas.height) {
         app.stage.removeChild(projectile)
-        app.ticker.remove(move) // Обязательно удаляем обработчик движения снаряда
+        app.ticker.remove(move) // Удаляем обработчик движения
       }
     }
 
-    // Убедитесь, что каждый новый снаряд имеет свою анимацию
     app?.ticker.add(move)
   }
 
@@ -112,9 +107,8 @@
    */
   const createShip = (color: number, x: number, y: number): Graphics => {
     const ship = new Graphics()
-    ship.beginFill(color)
-    ship.drawRect(-cellSize / 2, -cellSize / 2, cellSize, cellSize) // Центрируем прямоугольник
-    ship.endFill()
+    ship.rect(-cellSize / 2, -cellSize / 2, cellSize, cellSize) // Центрируем прямоугольник
+    ship.fill(color)
     ship.x = (x * cellSize) + (cellSize / 2) // Центрируем по X
     ship.y = (y * cellSize) + (cellSize / 2) // Центрируем по Y
     if (app) app.stage.addChild(ship)
@@ -154,11 +148,9 @@
     if (!app) return
 
     const projectile = new Graphics()
-    projectile.beginFill(color)
-    projectile.drawCircle(0, 0, 5) // Радиус снаряда — 5
-    projectile.endFill()
+    projectile.circle(0, 0, 5)
+    projectile.fill(color)
 
-    // Снаряд стартует из центра корабля
     projectile.x = ship.x
     projectile.y = ship.y
 
@@ -175,11 +167,15 @@
    */
   const startShooting = () => {
     friendlyShips.forEach((ship) => {
-      setInterval(() => fireProjectile(ship, 'right', 0x00ff00), 1000) // Зелёные снаряды
+      setInterval(() => {
+        if (app) fireProjectile(ship, 'right', 0x00ff00) // Дружественные корабли
+      }, 1000)
     })
 
     enemyShips.forEach((ship) => {
-      setInterval(() => fireProjectile(ship, 'left', 0xff0000), 1000) // Красные снаряды
+      setInterval(() => {
+        if (app) fireProjectile(ship, 'left', 0xff0000) // Вражеские корабли
+      }, 1000)
     })
   }
 
