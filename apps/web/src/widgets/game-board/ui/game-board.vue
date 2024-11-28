@@ -10,6 +10,8 @@
 
   const friendlyShips: Graphics[] = [] // Список дружественных кораблей
   const enemyShips: Graphics[] = [] // Список вражеских кораблей
+  const lastFireTime: { [key: string]: number } = {} // Время последнего выстрела для каждого корабля
+  const fireDelay = 1000 // Задержка между выстрелами в миллисекундах (например, 1 секунда)
 
   /**
    * Рассчитать размеры сетки и клеток в зависимости от экрана
@@ -51,8 +53,16 @@
 
   /**
    * Проверка на попадание снаряда в корабль
+   * @param projectile Снаряд
+   * @param enemyShip Вражеский корабль
+   * @param shooter Корабль, из которого был выстрелен снаряд
    */
-  const checkCollision = (projectile: Graphics, enemyShip: Graphics): boolean => {
+  const checkCollision = (projectile: Graphics, enemyShip: Graphics, shooter: Graphics): boolean => {
+    // Проверяем, не столкнулся ли снаряд с кораблем, из которого он был выстрелен
+    if (enemyShip === shooter) {
+      return false
+    }
+
     // Для простоты: проверяем пересечение с прямоугольником, занимаемым кораблём
     const distanceX = (projectile.x - enemyShip.x)
     const distanceY = (projectile.y - enemyShip.y)
@@ -65,8 +75,9 @@
    * Анимация движения снаряда
    * @param projectile Снаряд
    * @param direction Направление движения ('left' или 'right')
+   * @param shooter Корабль, из которого был выстрелен снаряд
    */
-  const animateProjectile = (projectile: Graphics, direction: 'left' | 'right') => {
+  const animateProjectile = (projectile: Graphics, direction: 'left' | 'right', shooter: Graphics) => {
     const speed = 5
     const deviationAngle = (Math.random() * 0.4) - 0.2 // Отклонение траектории
 
@@ -83,7 +94,7 @@
       // Проверка на попадание
       // eslint-disable-next-line no-restricted-syntax
       for (const enemyShip of [...enemyShips, ...friendlyShips]) {
-        if (checkCollision(projectile, enemyShip)) {
+        if (checkCollision(projectile, enemyShip, shooter)) {
           app.stage.removeChild(projectile) // Удаляем снаряд
           return // Завершаем обработку снаряда
         }
@@ -143,9 +154,22 @@
    * Стрельба снарядом
    * @param ship Корабль, который стреляет
    * @param direction Направление выстрела ('left' или 'right')
+   * @param color Цвет снаряда
    */
   const fireProjectile = (ship: Graphics, direction: 'left' | 'right', color: number) => {
     if (!app) return
+
+    const currentTime = Date.now()
+
+    // Проверка, прошла ли задержка между выстрелами
+    const lastTime = lastFireTime[`${ship.x},${ship.y}`] || 0
+    if (currentTime - lastTime < fireDelay) {
+      return // Если задержка не прошла, выстрел не делаем
+    }
+    console.log('fireProjectile', direction)
+
+    // Обновляем время последнего выстрела
+    lastFireTime[`${ship.x},${ship.y}`] = currentTime
 
     const projectile = new Graphics()
     projectile.circle(0, 0, 5)
@@ -159,7 +183,7 @@
 
     app.stage.addChild(projectile)
 
-    animateProjectile(projectile, direction) // Запускаем анимацию
+    animateProjectile(projectile, direction, ship) // Передаем корабль, из которого был выстрелен снаряд
   }
 
   /**
@@ -167,15 +191,15 @@
    */
   const startShooting = () => {
     friendlyShips.forEach((ship) => {
-      setInterval(() => {
-        if (app) fireProjectile(ship, 'right', 0x00ff00) // Дружественные корабли
-      }, 1000)
+      app?.ticker.add(() => {
+        fireProjectile(ship, 'right', 0x00ff00) // Дружественные корабли
+      })
     })
 
     enemyShips.forEach((ship) => {
-      setInterval(() => {
-        if (app) fireProjectile(ship, 'left', 0xff0000) // Вражеские корабли
-      }, 1000)
+      app?.ticker.add(() => {
+        fireProjectile(ship, 'left', 0xff0000) // Вражеские корабли
+      })
     })
   }
 
