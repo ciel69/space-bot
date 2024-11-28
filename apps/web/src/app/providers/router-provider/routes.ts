@@ -6,4 +6,9 @@ export const routes: RouteRecordRaw[] = [
         name: 'home',
         component: () => import('@/pages/home/ui/home-page.vue'),
     },
+    {
+        path: '/map',
+        name: 'map',
+        component: () => import('@/pages/map/ui/map-page.vue'),
+    },
 ]

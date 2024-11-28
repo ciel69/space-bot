@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue'
+  import { nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
   import { Application, Graphics, Ticker } from 'pixi.js'
 
   const field = useTemplateRef('field')
@@ -196,12 +196,12 @@
     })
   }
 
-  const destroyPixi = () => {
-    if (app) {
-      app.destroy(true, { children: true })
-      app = null
-    }
-  }
+  // const destroyPixi = () => {
+  //   if (app) {
+  //     app.destroy(true, { children: true })
+  //     app = null
+  //   }
+  // }
 
   const initializePixi = async () => {
     if (!field.value) return
@@ -230,7 +230,7 @@
   }
 
   onMounted(initializePixi)
-  onBeforeUnmount(destroyPixi)
+  // onBeforeUnmount(destroyPixi)
   watch(isRunning, (val) => {
     if (val) {
       ticker.start()

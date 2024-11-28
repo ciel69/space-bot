@@ -2,14 +2,14 @@
   // import { retrieveLaunchParams } from '@telegram-apps/sdk-vue'
   // import axios from 'axios'
 
-  import { onBeforeMount, ref } from 'vue'
+  import { onBeforeMount } from 'vue'
   import { Layout } from '@/shared/layout'
   import { GameBoard } from '@/widgets/game-board'
   import { Navigation } from '@/shared/navigation'
 
   // const { initDataRaw } = retrieveLaunchParams()
 
-  const dataRes = ref({})
+  // const dataRes = ref({})
 
   const sendAuthData = async () => {
     // try {
@@ -31,7 +31,6 @@
   <Layout>
     <GameBoard />
     <template #navigation>
-      <pre>{{ dataRes }}</pre>
       <Navigation />
     </template>
   </Layout>
