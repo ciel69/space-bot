@@ -1,8 +1,12 @@
 <script setup lang="ts">
-  import { nextTick, onBeforeUnmount, onMounted, useTemplateRef } from 'vue'
-  import { Application, Graphics } from 'pixi.js'
+  import { nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue'
+  import { Application, Graphics, Ticker } from 'pixi.js'
 
   const field = useTemplateRef('field')
+  const isRunning = ref(false)
+
+  const ticker = Ticker.shared
+  ticker.autoStart = false
   let gridSize = 10 // Размер сетки (10x10)
   let cellSize = 50 // Размер клетки в пикселях
 
@@ -13,162 +17,156 @@
   const lastFireTime: { [key: string]: number } = {} // Время последнего выстрела для каждого корабля
   const fireDelay = 1000 // Задержка между выстрелами в миллисекундах (например, 1 секунда)
 
-  /**
-   * Рассчитать размеры сетки и клеток в зависимости от экрана
-   */
+  type Ship = Graphics & {
+    isFriendly: boolean
+  }
+
+  let draggingShip: Ship | null = null
+  let offsetX = 0
+  let offsetY = 0
+
   const calculateGridAndCellSize = () => {
     const screenWidth = window.innerWidth
     const screenHeight = window.innerHeight
-
-    // Устанавливаем сетку 10x10, чтобы сохранить пропорции
     gridSize = 10
-
-    // Выбираем минимальный размер клетки, чтобы поле помещалось на экран
     cellSize = Math.min(screenWidth / gridSize, screenHeight / gridSize)
   }
 
-  /**
-   * Отрисовка сетки поля боя
-   */
   const drawGrid = () => {
     if (!app) return
-
     const grid = new Graphics()
 
     for (let x = 0; x < gridSize; x++) {
       for (let y = 0; y < gridSize; y++) {
-        // Рисуем каждую ячейку с отдельным стилем
         grid.rect(x * cellSize, y * cellSize, cellSize, cellSize)
-        grid.fill(0x2d2d2d) // Тёмно-серый фон ячейки
+        grid.fill(0x2d2d2d)
         grid.stroke({
           width: 2,
           color: 0xffffff,
           alpha: 0.4,
-        }) // Белые линии для границ
+        })
       }
     }
 
     app.stage.addChild(grid)
   }
 
-  /**
-   * Проверка на попадание снаряда в корабль
-   * @param projectile Снаряд
-   * @param enemyShip Вражеский корабль
-   * @param shooter Корабль, из которого был выстрелен снаряд
-   */
   const checkCollision = (projectile: Graphics, enemyShip: Graphics, shooter: Graphics): boolean => {
-    // Проверяем, не столкнулся ли снаряд с кораблем, из которого он был выстрелен
     if (enemyShip === shooter) {
       return false
     }
 
-    // Для простоты: проверяем пересечение с прямоугольником, занимаемым кораблём
     const distanceX = (projectile.x - enemyShip.x)
     const distanceY = (projectile.y - enemyShip.y)
     const distance = Math.sqrt((distanceX * distanceX) + (distanceY * distanceY))
 
-    return (distance < ((cellSize / 2) + 5)) // Если расстояние меньше, чем радиус снаряда + половина размера ячейки
+    return (distance < ((cellSize / 2) + 5))
   }
 
-  /**
-   * Анимация движения снаряда
-   * @param projectile Снаряд
-   * @param direction Направление движения ('left' или 'right')
-   * @param shooter Корабль, из которого был выстрелен снаряд
-   */
   const animateProjectile = (projectile: Graphics, direction: 'left' | 'right', shooter: Graphics) => {
     const speed = 5
-    const deviationAngle = (Math.random() * 0.4) - 0.2 // Отклонение траектории
+    const deviationAngle = (Math.random() * 0.4) - 0.2
 
     const move = () => {
       if (!projectile || !app) return
 
-      // Движение снаряда
       const deviationX = Math.sin(deviationAngle) * 0.5
       const deviationY = Math.cos(deviationAngle) * 0.15
 
       projectile.x += (direction === 'right' ? speed : -speed) + deviationX
       projectile.y += deviationY
 
-      // Проверка на попадание
       // eslint-disable-next-line no-restricted-syntax
       for (const enemyShip of [...enemyShips, ...friendlyShips]) {
         if (checkCollision(projectile, enemyShip, shooter)) {
-          app.stage.removeChild(projectile) // Удаляем снаряд
-          return // Завершаем обработку снаряда
+          app.stage.removeChild(projectile)
+          return
         }
       }
 
-      // Удаление снаряда за пределами поля
       if (projectile.x < 0 || projectile.x > app.canvas.width || projectile.y < 0 || projectile.y > app.canvas.height) {
         app.stage.removeChild(projectile)
-        app.ticker.remove(move) // Удаляем обработчик движения
+        app.ticker.remove(move)
       }
     }
 
     app?.ticker.add(move)
   }
 
-  /**
-   * Создание корабля
-   * @param color Цвет корабля
-   * @param x Координата X
-   * @param y Координата Y
-   */
-  const createShip = (color: number, x: number, y: number): Graphics => {
-    const ship = new Graphics()
-    ship.rect(-cellSize / 2, -cellSize / 2, cellSize, cellSize) // Центрируем прямоугольник
+  const createShip = (color: number, x: number, y: number, isFriendly: boolean): Graphics => {
+    const ship = new Graphics() as Ship
+    ship.rect(-cellSize / 2, -cellSize / 2, cellSize, cellSize)
     ship.fill(color)
-    ship.x = (x * cellSize) + (cellSize / 2) // Центрируем по X
-    ship.y = (y * cellSize) + (cellSize / 2) // Центрируем по Y
+    ship.x = (x * cellSize) + (cellSize / 2)
+    ship.y = (y * cellSize) + (cellSize / 2)
+    ship.isFriendly = isFriendly
     if (app) app.stage.addChild(ship)
+
+    // Сделаем корабль интерактивным
+    ship.interactive = true
+    const initCoord = [(x * cellSize) + (cellSize / 2), (y * cellSize) + (cellSize / 2)]
+
+    // Добавляем события для перетаскивания
+    ship.on('pointerdown', (event) => {
+      if (!ship.isFriendly) return // Запрещаем перетаскивать вражеские корабли
+
+      draggingShip = ship
+      const pointer = event.data.getLocalPosition(ship.parent)
+      offsetX = pointer.x - ship.x
+      offsetY = pointer.y - ship.y
+    })
+
+    ship.on('pointermove', (event) => {
+      if (draggingShip) {
+        const pointer = event.data.getLocalPosition(ship.parent)
+        draggingShip.x = pointer.x - offsetX
+        draggingShip.y = pointer.y - offsetY
+      }
+    })
+
+    ship.on('pointerup', () => {
+      if (draggingShip) {
+        // Ограничиваем область для дружественных кораблей
+        const maxX = (gridSize / 2) * cellSize
+
+        if (draggingShip.isFriendly && draggingShip.x < maxX) {
+          // Привязка к ближайшей клетке с учётом размеров корабля
+          draggingShip.x = (Math.floor(draggingShip.x / cellSize) * ((cellSize * 2) / 2)) + (cellSize / 2)
+          draggingShip.y = (Math.floor(draggingShip.y / cellSize) * ((cellSize * 2) / 2)) + (cellSize / 2)
+        } else {
+          console.log('else', initCoord)
+          draggingShip.x = initCoord[0]
+          draggingShip.y = initCoord[1]
+        }
+
+        draggingShip = null
+      }
+    })
+
     return ship
   }
 
-  /**
-   * Добавление дружественного корабля на поле боя
-   * @param x Координата X
-   * @param y Координата Y
-   */
   const addFriendlyShip = (x: number, y: number) => {
     if (!app) return
-
-    const ship = createShip(0x0077ff, x, y)
+    const ship = createShip(0x0077ff, x, y, true)
     friendlyShips.push(ship)
   }
 
-  /**
-   * Добавление вражеского корабля на поле боя
-   * @param x Координата X
-   * @param y Координата Y
-   */
   const addEnemyShip = (x: number, y: number) => {
     if (!app) return
-
-    const ship = createShip(0xff0000, x, y)
+    const ship = createShip(0xff0000, x, y, false)
     enemyShips.push(ship)
   }
 
-  /**
-   * Стрельба снарядом
-   * @param ship Корабль, который стреляет
-   * @param direction Направление выстрела ('left' или 'right')
-   * @param color Цвет снаряда
-   */
   const fireProjectile = (ship: Graphics, direction: 'left' | 'right', color: number) => {
     if (!app) return
-
     const currentTime = Date.now()
-
-    // Проверка, прошла ли задержка между выстрелами
     const lastTime = lastFireTime[`${ship.x},${ship.y}`] || 0
     if (currentTime - lastTime < fireDelay) {
-      return // Если задержка не прошла, выстрел не делаем
+      return
     }
     console.log('fireProjectile', direction)
 
-    // Обновляем время последнего выстрела
     lastFireTime[`${ship.x},${ship.y}`] = currentTime
 
     const projectile = new Graphics()
@@ -178,34 +176,27 @@
     projectile.x = ship.x
     projectile.y = ship.y
 
-    // Смещение по оси X в зависимости от направления
     projectile.x += (direction === 'right' ? cellSize / 2 : -cellSize / 2)
 
     app.stage.addChild(projectile)
 
-    animateProjectile(projectile, direction, ship) // Передаем корабль, из которого был выстрелен снаряд
+    animateProjectile(projectile, direction, ship)
   }
 
-  /**
-   * Старт стрельбы между дружественными и вражескими кораблями
-   */
   const startShooting = () => {
     friendlyShips.forEach((ship) => {
-      app?.ticker.add(() => {
-        fireProjectile(ship, 'right', 0x00ff00) // Дружественные корабли
+      ticker.add(() => {
+        fireProjectile(ship, 'right', 0x00ff00)
       })
     })
 
     enemyShips.forEach((ship) => {
-      app?.ticker.add(() => {
-        fireProjectile(ship, 'left', 0xff0000) // Вражеские корабли
+      ticker.add(() => {
+        fireProjectile(ship, 'left', 0xff0000)
       })
     })
   }
 
-  /**
-   * Уничтожение PixiJS приложения перед размонтированием компонента
-   */
   const destroyPixi = () => {
     if (app) {
       app.destroy(true, { children: true })
@@ -213,9 +204,6 @@
     }
   }
 
-  /**
-   * Инициализация PixiJS приложения
-   */
   const initializePixi = async () => {
     if (!field.value) return
     await nextTick()
@@ -229,31 +217,35 @@
       resizeTo: field.value!,
     })
 
-    // Добавляем canvas PixiJS в DOM
     field.value.appendChild(app.canvas)
 
-    // Отрисовываем сетку поля боя
     drawGrid()
 
-    // Добавляем дружественные корабли
     addFriendlyShip(2, 3)
     addFriendlyShip(4, 5)
 
-    // Добавляем вражеские корабли
     addEnemyShip(6, 3)
     addEnemyShip(8, 5)
 
-    // Запускаем стрельбу
     startShooting()
   }
 
   onMounted(initializePixi)
   onBeforeUnmount(destroyPixi)
-
+  watch(isRunning, (val) => {
+    if (val) {
+      ticker.start()
+    } else {
+      ticker.stop()
+    }
+  })
 </script>
 
 <template>
-  <div ref="field" class="field-play" />
+  <div>
+    <div ref="field" class="field-play" />
+    <button type="button" @click="() => isRunning = !isRunning">{{ isRunning ? 'Pause' : 'Start' }}</button>
+  </div>
 </template>
 
 <style scoped lang="scss">
