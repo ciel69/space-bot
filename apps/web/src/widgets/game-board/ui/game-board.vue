@@ -165,7 +165,6 @@
     if (currentTime - lastTime < fireDelay) {
       return
     }
-    console.log('fireProjectile', direction)
 
     lastFireTime[`${ship.x},${ship.y}`] = currentTime
 
