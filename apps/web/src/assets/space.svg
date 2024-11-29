@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="2000" viewBox="0 0 2000 2000">
+    <!-- Градиенты для разных цветов туманностей -->
+    <defs>
+        <radialGradient id="nebulaGradient1" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+            <stop offset="0%" style="stop-color: rgba(255, 0, 0, 0.6); stop-opacity: 1" />
+            <stop offset="100%" style="stop-color: rgba(0, 0, 0, 0); stop-opacity: 0" />
+        </radialGradient>
+        <radialGradient id="nebulaGradient2" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+            <stop offset="0%" style="stop-color: rgba(0, 0, 255, 0.5); stop-opacity: 1" />
+            <stop offset="100%" style="stop-color: rgba(0, 0, 0, 0); stop-opacity: 0" />
+        </radialGradient>
+        <radialGradient id="nebulaGradient3" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+            <stop offset="0%" style="stop-color: rgba(0, 255, 0, 0.5); stop-opacity: 1" />
+            <stop offset="100%" style="stop-color: rgba(0, 0, 0, 0); stop-opacity: 0" />
+        </radialGradient>
+        <radialGradient id="nebulaGradient4" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+            <stop offset="0%" style="stop-color: rgba(255, 255, 0, 0.5); stop-opacity: 1" />
+            <stop offset="100%" style="stop-color: rgba(0, 0, 0, 0); stop-opacity: 0" />
+        </radialGradient>
+
+        <!-- Градиенты для галактик -->
+        <radialGradient id="galaxyGradient1" cx="50%" cy="50%" r="60%" fx="50%" fy="50%">
+            <stop offset="0%" style="stop-color: rgba(255, 255, 255, 0.3); stop-opacity: 1" />
+            <stop offset="100%" style="stop-color: rgba(0, 0, 0, 0); stop-opacity: 0" />
+        </radialGradient>
+        <radialGradient id="galaxyGradient2" cx="50%" cy="50%" r="60%" fx="50%" fy="50%">
+            <stop offset="0%" style="stop-color: rgba(200, 200, 255, 0.4); stop-opacity: 1" />
+            <stop offset="100%" style="stop-color: rgba(0, 0, 0, 0); stop-opacity: 0" />
+        </radialGradient>
+    </defs>
+
+    <!-- Туманности -->
+    <circle cx="1000" cy="1000" r="200" fill="url(#nebulaGradient1)" />
+    <circle cx="1500" cy="800" r="180" fill="url(#nebulaGradient2)" />
+    <circle cx="500" cy="1500" r="150" fill="url(#nebulaGradient3)" />
+    <circle cx="1200" cy="400" r="250" fill="url(#nebulaGradient4)" />
+
+    <!-- Звезды -->
+    <circle cx="100" cy="100" r="2" fill="white" />
+    <circle cx="200" cy="400" r="1.5" fill="white" />
+    <circle cx="500" cy="700" r="1" fill="white" />
+    <circle cx="800" cy="1000" r="2.5" fill="white" />
+    <circle cx="1200" cy="1500" r="1" fill="white" />
+    <circle cx="1300" cy="300" r="3" fill="white" />
+    <circle cx="1500" cy="600" r="1.8" fill="white" />
+    <circle cx="1600" cy="800" r="2.2" fill="white" />
+    <circle cx="1700" cy="1000" r="1" fill="white" />
+    <circle cx="1800" cy="1200" r="2" fill="white" />
+    <circle cx="500" cy="1500" r="1.5" fill="white" />
+    <circle cx="300" cy="1700" r="2.5" fill="white" />
+    <circle cx="700" cy="1800" r="1" fill="white" />
+    <circle cx="900" cy="300" r="2" fill="white" />
+    <circle cx="1000" cy="1200" r="1.2" fill="white" />
+    <circle cx="1100" cy="400" r="1.8" fill="white" />
+    <circle cx="1400" cy="900" r="1.5" fill="white" />
+    <circle cx="1600" cy="500" r="2" fill="white" />
+    <circle cx="1800" cy="1300" r="2.5" fill="white" />
+    <circle cx="1900" cy="700" r="1.8" fill="white" />
+    <circle cx="200" cy="1100" r="2" fill="white" />
+    <circle cx="300" cy="1400" r="2" fill="yellow" />
+    <circle cx="1200" cy="400" r="1.5" fill="blue" />
+    <circle cx="1400" cy="1700" r="2" fill="red" />
+    <circle cx="1600" cy="300" r="1" fill="green" />
+
+    <!-- Галактики -->
+    <circle cx="400" cy="600" r="150" fill="url(#galaxyGradient1)" />
+    <circle cx="1600" cy="1400" r="180" fill="url(#galaxyGradient2)" />
+</svg>
