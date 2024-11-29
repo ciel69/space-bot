@@ -2,6 +2,7 @@
   import { onMounted, useTemplateRef, nextTick } from 'vue'
   import { Application, Assets, Container, Graphics, Sprite } from 'pixi.js'
   import spaceSrc from '@/assets/space.svg'
+  import spaceWebSrc from '@/assets/space.webp'
   import { Navigation } from '@/shared/navigation'
   import { Layout } from '@/shared/layout'
 
@@ -108,13 +109,13 @@
 
     await Assets.load({
       alias: 'spiceOne',
-      src: spaceSrc,
-      loadParser: 'loadSVG',
+      src: spaceWebSrc,
     })
-    const background = Sprite.from(spaceSrc)
+    const background = Sprite.from('spiceOne')
+    background.alpha = 0.5
     mapContainer.addChild(background)
 
-    createStars(100)
+    // createStars(100)
 
     app.canvas.addEventListener('pointerdown', onDragStart)
     app.canvas.addEventListener('pointermove', onDragMove)
