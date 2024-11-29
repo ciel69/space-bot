@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { onMounted, onUnmounted, useTemplateRef, nextTick } from 'vue'
+  import { onMounted, useTemplateRef, nextTick } from 'vue'
   import { Application, Assets, Container, Graphics, Sprite } from 'pixi.js'
   import spaceSrc from '@/assets/space.svg'
   import { Navigation } from '@/shared/navigation'
