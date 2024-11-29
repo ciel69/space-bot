@@ -1,7 +1,6 @@
 <script setup lang="ts">
   import { onMounted, useTemplateRef, nextTick } from 'vue'
-  import { Application, Assets, Container, Graphics, Sprite } from 'pixi.js'
-  import spaceSrc from '@/assets/space.svg'
+  import { Application, Assets, Container, Sprite } from 'pixi.js'
   import spaceWebSrc from '@/assets/space.webp'
   import { Navigation } from '@/shared/navigation'
   import { Layout } from '@/shared/layout'
@@ -79,16 +78,16 @@
     mapContainer.y = Math.max(minY, Math.min(maxY, mapContainer.y))
   }
 
-  const createStars = (count: number) => {
-    for (let i = 0; i < count; i++) {
-      const star = new Graphics()
-      star.circle(0, 0, (Math.random() * 2) + 1)
-      star.fill(0xffffff)
-      star.x = (Math.random() * 4000) - 1000
-      star.y = (Math.random() * 4000) - 1000
-      mapContainer.addChild(star)
-    }
-  }
+  // const createStars = (count: number) => {
+  //   for (let i = 0; i < count; i++) {
+  //     const star = new Graphics()
+  //     star.circle(0, 0, (Math.random() * 2) + 1)
+  //     star.fill(0xffffff)
+  //     star.x = (Math.random() * 4000) - 1000
+  //     star.y = (Math.random() * 4000) - 1000
+  //     mapContainer.addChild(star)
+  //   }
+  // }
 
   const initPixiApp = async () => {
     await nextTick()
