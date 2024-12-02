@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { TelegramModule } from './modules/telegram/telegram.module';
+import { BattleModule } from './modules/battle/battle.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { TelegramModule } from './modules/telegram/telegram.module';
       rootPath: join(__dirname, '../../', 'web/dist'),
     }),
     TelegramModule,
+    BattleModule,
   ],
   controllers: [AppController],
   providers: [AppService],
