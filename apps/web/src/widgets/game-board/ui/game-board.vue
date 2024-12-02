@@ -233,7 +233,8 @@
   onMounted(initializePixi)
   // onBeforeUnmount(destroyPixi)
   watch(isRunning, (val) => {
-    hapticFeedback.impactOccurred('heavy')
+    hapticFeedback.notificationOccurred('success')
+    hapticFeedback.selectionChanged()
     if (val) {
       ticker.start()
     } else {
