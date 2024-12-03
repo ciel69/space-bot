@@ -7,6 +7,7 @@ import {
   // Hears,
   Ctx,
   Help,
+  CallbackQuery,
   // Admin,
 } from '@grammyjs/nestjs';
 import { Logger, UseFilters, UseInterceptors } from '@nestjs/common';
@@ -44,6 +45,13 @@ export class EchoUpdate {
     // const me = await this.bot.api.getMe()
     return ctx.reply('Curious? Click me!', {
       reply_markup: this.inlineKeyboard,
+    });
+  }
+
+  @CallbackQuery('click-payload')
+  async onCallback(@Ctx() ctx: Context) {
+    return ctx.answerCallbackQuery({
+      text: 'You were curious, indeed!',
     });
   }
 
