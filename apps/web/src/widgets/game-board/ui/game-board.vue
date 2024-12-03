@@ -81,6 +81,9 @@
       for (const enemyShip of [...enemyShips, ...friendlyShips]) {
         if (checkCollision(projectile, enemyShip, shooter)) {
           app.stage.removeChild(projectile)
+          if (hapticFeedback.impactOccurred.isAvailable()) {
+            hapticFeedback.impactOccurred('light')
+          }
           return
         }
       }
