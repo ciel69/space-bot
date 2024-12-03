@@ -237,6 +237,12 @@
     if (hapticFeedback.impactOccurred.isAvailable()) {
       hapticFeedback.impactOccurred('medium')
     }
+    if (hapticFeedback.notificationOccurred.isAvailable()) {
+      hapticFeedback.notificationOccurred('success')
+    }
+    if (hapticFeedback.selectionChanged.isAvailable()) {
+      hapticFeedback.selectionChanged()
+    }
     if (val) {
       ticker.start()
     } else {
