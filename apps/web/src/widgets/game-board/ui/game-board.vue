@@ -231,19 +231,16 @@
     startShooting()
   }
 
-  onMounted(initializePixi)
-  // onBeforeUnmount(destroyPixi)
-  watch(isRunning, (val) => {
-    postEvent('web_app_trigger_haptic_feedback', { type: 'impact', impact_style: 'heavy' })
+  const changeNavigation = () => {
     if (hapticFeedback.impactOccurred.isAvailable()) {
       hapticFeedback.impactOccurred('medium')
     }
-    if (hapticFeedback.notificationOccurred.isAvailable()) {
-      hapticFeedback.notificationOccurred('success')
-    }
-    if (hapticFeedback.selectionChanged.isAvailable()) {
-      hapticFeedback.selectionChanged()
-    }
+    isRunning.value = !isRunning.value
+  }
+
+  onMounted(initializePixi)
+  // onBeforeUnmount(destroyPixi)
+  watch(isRunning, (val) => {
     if (val) {
       ticker.start()
     } else {
@@ -255,7 +252,7 @@
 <template>
   <div>
     <div ref="field" class="field-play" />
-    <button type="button" @click="() => isRunning = !isRunning">{{ isRunning ? 'Pause' : 'Start' }}</button>
+    <button type="button" @click="changeNavigation">{{ isRunning ? 'Pause' : 'Start' }}</button>
   </div>
 </template>
 
