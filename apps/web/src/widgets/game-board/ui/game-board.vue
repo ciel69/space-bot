@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
   import { Application, Graphics, Ticker } from 'pixi.js'
-  import { hapticFeedback } from '@telegram-apps/sdk'
+  import { hapticFeedback } from '@telegram-apps/sdk-vue'
 
   const field = useTemplateRef('field')
   const isRunning = ref(false)
@@ -232,7 +232,9 @@
   }
 
   const changeNavigation = () => {
-    hapticFeedback.impactOccurred('heavy')
+    if (hapticFeedback.impactOccurred.isAvailable()) {
+      hapticFeedback.impactOccurred('medium')
+    }
     isRunning.value = !isRunning.value
   }
 
