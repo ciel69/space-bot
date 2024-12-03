@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
+  import { nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue'
   import { Application, Graphics, Ticker } from 'pixi.js'
   import { hapticFeedback } from '@telegram-apps/sdk-vue'
 
@@ -241,8 +241,18 @@
     isRunning.value = !isRunning.value
   }
 
+  /**
+   * Уничтожение PixiJS приложения перед размонтированием компонента
+   */
+  const destroyPixi = () => {
+    if (app) {
+      app.destroy(true, { children: true })
+      app = null
+    }
+  }
+
   onMounted(initializePixi)
-  // onBeforeUnmount(destroyPixi)
+  onBeforeUnmount(destroyPixi)
   watch(isRunning, (val) => {
     if (val) {
       ticker.start()

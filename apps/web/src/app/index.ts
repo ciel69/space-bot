@@ -1,6 +1,8 @@
 import { createApp } from 'vue'
 import { init, backButton, initData, swipeBehavior, miniApp, themeParams, viewport } from '@telegram-apps/sdk-vue'
 
+import { Assets } from 'pixi.js'
+import spaceWebSrc from '@/assets/space.webp'
 import App from './app.vue'
 import { router } from './providers/router-provider/router-provider'
 
@@ -25,4 +27,9 @@ viewport.mount().then(() => {
     themeParams.bindCssVars()
 }).catch((e: string) => {
     console.error('Something went wrong mounting the viewport', e)
+})
+
+await Assets.load({
+    alias: 'spiceOne',
+    src: spaceWebSrc,
 })

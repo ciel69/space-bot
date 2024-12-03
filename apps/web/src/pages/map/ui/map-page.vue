@@ -1,7 +1,6 @@
 <script setup lang="ts">
   import { onMounted, useTemplateRef, nextTick } from 'vue'
-  import { Application, Assets, Container, Sprite } from 'pixi.js'
-  import spaceWebSrc from '@/assets/space.webp'
+  import { Application, Container, Sprite } from 'pixi.js'
   import { Navigation } from '@/shared/navigation'
   import { Layout } from '@/shared/layout'
 
@@ -105,11 +104,6 @@
 
     mapContainer = new Container()
     app.stage.addChild(mapContainer)
-
-    await Assets.load({
-      alias: 'spiceOne',
-      src: spaceWebSrc,
-    })
     const background = Sprite.from('spiceOne')
     background.alpha = 0.5
     mapContainer.addChild(background)
