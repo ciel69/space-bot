@@ -104,7 +104,7 @@
 
     mapContainer = new Container()
     app.stage.addChild(mapContainer)
-    const background = Sprite.from('spiceOne')
+    const background = Sprite.from('spaceOne')
     background.alpha = 0.5
     mapContainer.addChild(background)
 

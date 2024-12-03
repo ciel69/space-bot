@@ -25,11 +25,10 @@ viewport.mount().then(() => {
     viewport.bindCssVars()
     miniApp.bindCssVars()
     themeParams.bindCssVars()
+    Assets.load({
+        alias: 'spaceOne',
+        src: spaceWebSrc,
+    })
 }).catch((e: string) => {
     console.error('Something went wrong mounting the viewport', e)
-})
-
-await Assets.load({
-    alias: 'spiceOne',
-    src: spaceWebSrc,
 })
