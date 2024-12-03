@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@telegram-apps/sdk-vue": "^1.0.4",
+    "@telegram-apps/sdk-vue": "^1.0.7",
     "axios": "^1.7.8",
     "pixi.js": "^8.5.2",
     "vue": "^3.5.12",
