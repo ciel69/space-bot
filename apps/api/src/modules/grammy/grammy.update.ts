@@ -12,7 +12,7 @@ import {
 import { Logger, UseFilters, UseInterceptors } from '@nestjs/common';
 import { GrammyExceptionFilter, ResponseTimeInterceptor } from './lib';
 import { EchoBotName } from './grammy.constants';
-import { GrammyService } from './grammy.service';
+// import { GrammyService } from './grammy.service';
 
 const logger = new Logger('bot:echo.update');
 
@@ -23,7 +23,6 @@ export class EchoUpdate {
   constructor(
     @InjectBot(EchoBotName)
     private readonly bot: Bot<Context>,
-    private readonly echoService: GrammyService,
   ) {
     logger.debug(
       `Initializing`,
