@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
   import { Application, Graphics, Ticker } from 'pixi.js'
-  import { hapticFeedback } from '@telegram-apps/sdk'
+  import { hapticFeedback, postEvent } from '@telegram-apps/sdk'
 
   const field = useTemplateRef('field')
   const isRunning = ref(false)
@@ -234,6 +234,7 @@
   onMounted(initializePixi)
   // onBeforeUnmount(destroyPixi)
   watch(isRunning, (val) => {
+    postEvent('web_app_trigger_haptic_feedback', { type: 'impact', impact_style: 'heavy' })
     if (hapticFeedback.impactOccurred.isAvailable()) {
       hapticFeedback.impactOccurred('medium')
     }
