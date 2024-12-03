@@ -232,9 +232,7 @@
   }
 
   const changeNavigation = () => {
-    if (hapticFeedback.impactOccurred.isAvailable()) {
-      hapticFeedback.impactOccurred('heavy')
-    }
+    hapticFeedback.impactOccurred('heavy')
     isRunning.value = !isRunning.value
   }
 
