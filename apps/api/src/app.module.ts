@@ -5,6 +5,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { TelegramModule } from './modules/telegram/telegram.module';
 import { BattleModule } from './modules/battle/battle.module';
+import { GrammyModule } from './modules/grammy/grammy.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { BattleModule } from './modules/battle/battle.module';
     }),
     TelegramModule,
     BattleModule,
+    GrammyModule,
   ],
   controllers: [AppController],
   providers: [AppService],
