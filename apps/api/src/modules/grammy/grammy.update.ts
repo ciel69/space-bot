@@ -1,4 +1,4 @@
-import { Bot, Context } from 'grammy';
+import { Bot, Context, InlineKeyboard } from 'grammy';
 import {
   InjectBot,
   Update,
@@ -20,6 +20,11 @@ const logger = new Logger('bot:echo.update');
 @UseInterceptors(ResponseTimeInterceptor)
 @UseFilters(GrammyExceptionFilter)
 export class EchoUpdate {
+  private readonly inlineKeyboard = new InlineKeyboard().text(
+    'click',
+    'click-payload',
+  );
+
   constructor(
     @InjectBot(EchoBotName)
     private readonly bot: Bot<Context>,
@@ -31,13 +36,15 @@ export class EchoUpdate {
   }
 
   @Start()
-  async onStart(@Ctx() ctx: Context): Promise<void> {
+  async onStart(@Ctx() ctx: Context) {
     logger.debug(
       'onStart!!',
       this.bot ? this.bot.botInfo.first_name : '(booting)',
     );
     // const me = await this.bot.api.getMe()
-    ctx.reply(`Hey, I'm ${this.bot.botInfo.first_name}`);
+    return ctx.reply('Curious? Click me!', {
+      reply_markup: this.inlineKeyboard,
+    });
   }
 
   @Help()
