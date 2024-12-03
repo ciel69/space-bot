@@ -1,9 +1,7 @@
 <script setup lang="ts">
-  import { onMounted, onBeforeUnmount, withDefaults } from 'vue'
-  import { useRouter } from 'vue-router'
-  import { backButton } from '@telegram-apps/sdk-vue'
+  import { withDefaults } from 'vue'
 
-  const props = withDefaults(defineProps<{
+  withDefaults(defineProps<{
     /**
      * True if it is allowed to go back from this page.
      * @default true
@@ -12,20 +10,6 @@
     title: string;
   }>(), {
     back: true,
-  })
-
-  const router = useRouter()
-
-  onMounted(() => {
-    if (props.back) {
-      backButton.show()
-      const unsub = backButton.onClick(() => {
-        router.go(-1)
-      })
-      onBeforeUnmount(unsub)
-    } else {
-      backButton.hide()
-    }
   })
 </script>
 

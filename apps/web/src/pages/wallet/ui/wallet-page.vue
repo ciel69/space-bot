@@ -5,6 +5,8 @@
   import { UiPage } from '@/shared/ui/ui-page'
   import { UiLink } from '@/shared/ui/ui-link'
   import { UiDisplayData } from '@/shared/ui/ui-display-data'
+  import { Layout } from '@/shared/layout'
+  import { Navigation } from '@/shared/navigation'
 
   const { wallet } = useTonWallet()
 
@@ -18,35 +20,40 @@
 </script>
 
 <template>
-  <UiPage title="TON Connect">
-    <p v-if="!wallet">To display the data related to the TON Connect, it is required to connect your wallet.</p>
-    <template v-else>
-      <div v-if="walletExtended" class="ton-connect-page__provider">
-        <img
-          alt="Provider logo"
-          class="ton-connect-page__provider-image"
-          height="60"
-          :src="walletExtended.imageUrl"
-          width="60"
-        >
-        <div class="ton-connect-page__provider-meta">
-          <p class="ton-connect-page__provider-wallet-name">
-            {{ walletExtended.name }}&nbsp;
-            <span class="ton-connect-page__provider-app-name">
-              {{ walletExtended.appName }}
-            </span>
-          </p>
-          <UiLink :to="walletExtended.aboutUrl">
-            About connected wallet
-          </UiLink>
+  <Layout>
+    <UiPage title="TON Connect">
+      <p v-if="!wallet">To display the data related to the TON Connect, it is required to connect your wallet.</p>
+      <template v-else>
+        <div v-if="walletExtended" class="ton-connect-page__provider">
+          <img
+            alt="Provider logo"
+            class="ton-connect-page__provider-image"
+            height="60"
+            :src="walletExtended.imageUrl"
+            width="60"
+          >
+          <div class="ton-connect-page__provider-meta">
+            <p class="ton-connect-page__provider-wallet-name">
+              {{ walletExtended.name }}&nbsp;
+              <span class="ton-connect-page__provider-app-name">
+                {{ walletExtended.appName }}
+              </span>
+            </p>
+            <UiLink :to="walletExtended.aboutUrl">
+              About connected wallet
+            </UiLink>
+          </div>
         </div>
+        <UiDisplayData :rows />
+      </template>
+      <div class="ton-connect-page__button-container">
+        <TonConnectButton />
       </div>
-      <UiDisplayData :rows />
+    </UiPage>
+    <template #navigation>
+      <Navigation />
     </template>
-    <div class="ton-connect-page__button-container">
-      <TonConnectButton />
-    </div>
-  </UiPage>
+  </Layout>
 </template>
 
 <style scoped>
