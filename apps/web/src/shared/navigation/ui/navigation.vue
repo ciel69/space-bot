@@ -10,6 +10,9 @@
     <div class="navigation-item">
       <router-link to="/map">Map</router-link>
     </div>
+    <div class="navigation-item">
+      <router-link to="/wallet">Wallet</router-link>
+    </div>
   </div>
 </template>
 
