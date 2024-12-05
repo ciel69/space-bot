@@ -130,55 +130,35 @@
   }
 
   // eslint-disable-next-line @stylistic/js/max-len
-  const animateCardMovement = (card: Graphics, targetX: number, targetY: number, isPlayerCard = true) => {
-    console.log('animateCardMovement', card)
-    const speed = 3
-    const initialX = isPlayerCard
-      ? 50 + (activePlayerCardIndex.value * 60)
-      : 50 + (activeEnemyCardIndex.value * 60)
-    const initialY = isPlayerCard ? 550 : 50
-    // const targetWidth = 120
-    // const targetHeight = 180
-    // const initialWidth = 100
-    // const initialHeight = 150
+  const animateCardMovement = (card: Graphics, targetX: number, targetY: number) => {
+    const speed = 5 // Скорость перемещения
+    const startX = card.x
+    const startY = card.y
 
-    // Начальные параметры для анимации
-    let currentX = initialX
-    let currentY = initialY
-    // let width = initialWidth
-    // let height = initialHeight
+    let progress = 0 // Прогресс анимации (от 0 до 1)
 
-    // Создаем анимацию
     const move = () => {
-      console.log('move')
-      // Обновляем позицию карты
-      if (currentX < targetX) currentX += speed
-      if (currentY < targetY) currentY += speed
+      progress += speed / 100 // Увеличиваем прогресс
+      if (progress >= 1) {
+        progress = 1 // Ограничиваем прогресс до 1
+      }
 
-      // Вычисляем размер карты по ходу анимации
-      // width = initialWidth + (((targetWidth - initialWidth) * (currentX - initialX)) / (targetX - initialX))
-      // height = initialHeight + (((targetHeight - initialHeight) * (currentY - initialY)) / (targetY - initialY))
-      console.log('currentX', currentX)
-      console.log('currentY', currentY)
-      // const dt = time.deltaTime * 0.01
-      // card.tick = (card.tick + dt) % 1
-      card.x = currentX
-      card.y = currentY
-      // card.width = width
-      // card.height = height
+      // Линейная интерполяция позиций
+      card.x = startX + ((targetX - startX) * progress)
+      card.y = startY + ((targetY - startY) * progress)
 
-      // Если карта достигла цели, завершаем анимацию
-      if (currentX >= targetX && currentY >= targetY) {
+      // Если анимация завершена, удаляем тикер
+      if (progress === 1) {
         app?.ticker.remove(move)
       }
     }
 
-    // Добавляем цвет подсветки карты
-    // card.beginFill(color).drawRect(-width / 2, -height / 2, width, height).endFill()
+    // Добавляем карту на `stage`, если она ещё не добавлена
+    if (!app?.stage.children.includes(card)) {
+      app?.stage.addChild(card)
+    }
 
     // Запускаем анимацию
-    // const moveInterval = setInterval(move, 30) // 60 fps
-    // app!.ticker.add(move)
     app?.ticker.add(move)
   }
 
@@ -265,7 +245,12 @@
   const startBattle = async () => {
     isBattleActive.value = true
     await nextTick()
-    renderScene()
+    renderScene() // Убедимся, что графика всех карт отрисована
+
+    // Перемещение активных карт
+    // animateCardMovement(playerDeckGp[activePlayerCardIndex.value], 180, 400, true)
+    // animateCardMovement(enemyDeckGp[activeEnemyCardIndex.value], 180, 240, false)
+
     performBattle()
   }
 
