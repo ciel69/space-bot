@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import { computed, nextTick, onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
   import { Application, Graphics, Text, TextStyle } from 'pixi.js'
+  import { hapticFeedback } from '@telegram-apps/sdk-vue'
 
   const canvasRef = useTemplateRef('canvasRef')
 
@@ -35,6 +36,14 @@
 
   const isBattleActive = ref(false)
   const animationDuration = 500 // ms
+
+  const updateCardText = (cardGraphics: Graphics, card: Card) => {
+    const [hpText, shieldText, damageText] = cardGraphics.children as Text[]
+
+    hpText.text = `HP: ${card.hp}`
+    shieldText.text = `Shield: ${card.shield}`
+    damageText.text = `DMG: ${card.damage}`
+  }
 
   const drawCard = (card: Card, x: number, y: number): Graphics => {
     // console.log('drawCard', card)
@@ -96,41 +105,34 @@
   const renderScene = () => {
     if (!app) return
 
+    // Убедитесь, что не удаляете старые карты, а обновляете их
     app.stage.removeChildren()
 
-    // // Draw player health bar
-    // const playerHealthBar = new Graphics()
-    // playerHealthBar.beginFill(0x00ff00).drawRect(10, 600, playerHealth.value / 10, 10).endFill()
-    // app.stage.addChild(playerHealthBar)
-    //
-    // // Draw enemy health bar
-    // const enemyHealthBar = new Graphics()
-    // enemyHealthBar.beginFill(0xff0000).drawRect(10, 10, enemyHealth.value / 10, 10).endFill()
-    // app.stage.addChild(enemyHealthBar)
-
-    // Draw player deck
+    // Отображение оставшихся карт игрока
     playerDeck.value.forEach((card, index) => {
-      const cardGraphics = drawCard(card, 50 + (index * 80), 570)
-      playerDeckGp.push(cardGraphics)
+      const cardGraphics = playerDeckGp[index] || drawCard(card, 50 + (index * 80), 570)
+      if (!playerDeckGp[index]) {
+        playerDeckGp.push(cardGraphics)
+      }
+      if (!app!.stage.children.includes(cardGraphics)) {
+        app!.stage.addChild(cardGraphics)
+      }
     })
 
-    // Draw enemy deck
+    // Отображение оставшихся карт противника
     enemyDeck.value.forEach((card, index) => {
-      const cardGraphics = drawCard(card, 50 + (index * 80), 70)
-      enemyDeckGp.push(cardGraphics)
+      const cardGraphics = enemyDeckGp[index] || drawCard(card, 50 + (index * 80), 70)
+      if (!enemyDeckGp[index]) {
+        enemyDeckGp.push(cardGraphics)
+      }
+      if (!app!.stage.children.includes(cardGraphics)) {
+        app!.stage.addChild(cardGraphics)
+      }
     })
-
-    // Draw active cards
-    // if (isBattleActive.value) {
-    //   const playerCard = drawCard(playerDeck.value[activePlayerCardIndex.value], 180, 400)
-    //   const enemyCard = drawCard(enemyDeck.value[activeEnemyCardIndex.value], 180, 240)
-    //   app.stage.addChild(playerCard)
-    //   app.stage.addChild(enemyCard)
-    // }
   }
 
-  // eslint-disable-next-line @stylistic/js/max-len
   const animateCardMovement = (card: Graphics, targetX: number, targetY: number) => {
+    if (!card) return
     const speed = 5 // Скорость перемещения
     const startX = card.x
     const startY = card.y
@@ -149,6 +151,9 @@
 
       // Если анимация завершена, удаляем тикер
       if (progress === 1) {
+        if (hapticFeedback.impactOccurred.isAvailable()) {
+          hapticFeedback.impactOccurred('soft')
+        }
         app?.ticker.remove(move)
       }
     }
@@ -183,59 +188,61 @@
     const playerCard = playerDeck.value[activePlayerCardIndex.value]
     const enemyCard = enemyDeck.value[activeEnemyCardIndex.value]
 
-    // Animate card movement to the center of the screen
-    // const playerCardGraphics = drawCard(playerCard, 50 + (activePlayerCardIndex.value * 60), 550)
-    // const enemyCardGraphics = drawCard(enemyCard, 50 + (activeEnemyCardIndex.value * 60), 50)
+    const playerCardGraphics = playerDeckGp[activePlayerCardIndex.value]
+    const enemyCardGraphics = enemyDeckGp[activeEnemyCardIndex.value]
 
-    // Перемещение активных карт в центр экрана
-    animateCardMovement(playerDeckGp[activePlayerCardIndex.value], 180, 400, true)
-    animateCardMovement(enemyDeckGp[activeEnemyCardIndex.value], 180, 240, false)
+    // Анимация перемещения в центр
+    await Promise.all([
+      animateCardMovement(playerCardGraphics, 180, 400),
+      animateCardMovement(enemyCardGraphics, 180, 240),
+    ])
 
-    // app?.stage.addChild(playerCardGraphics)
-    // app?.stage.addChild(enemyCardGraphics)
-
-    // Use a loop for attacking, but with delays handled differently
-    while (playerCard.hp > 0 || enemyCard.hp > 0) {
-      // Simulate attack
+    // Бой до тех пор, пока HP не закончится у одной из карт
+    while (playerCard.hp > 0 && enemyCard.hp > 0) {
+      // Урон противнику
       enemyCard.shield -= playerCard.damage
       if (enemyCard.shield < 0) {
         enemyCard.hp += enemyCard.shield
         enemyCard.shield = 0
       }
+      updateCardText(enemyCardGraphics, enemyCard)
 
-      // Instead of `await` in the loop, just use `delay`
-      // eslint-disable-next-line no-await-in-loop,no-use-before-define
+      // eslint-disable-next-line no-use-before-define,no-await-in-loop
       await delay(animationDuration)
 
+      // Урон игроку
       playerCard.shield -= enemyCard.damage
       if (playerCard.shield < 0) {
         playerCard.hp += playerCard.shield
         playerCard.shield = 0
       }
+      updateCardText(playerCardGraphics, playerCard)
 
-      // eslint-disable-next-line no-await-in-loop,no-use-before-define
+      // eslint-disable-next-line no-use-before-define,no-await-in-loop
       await delay(animationDuration)
-
-      renderScene()
     }
 
+    // Проверка на смерть карт
     if (playerCard.hp <= 0) {
       activePlayerCardIndex.value++
-      if (activePlayerCardIndex.value >= playerDeck.value.length) {
+      if (activePlayerCardIndex.value < playerDeck.value.length) {
+        renderScene()
+      } else {
         playerHealth.value -= enemyCard.damage
       }
     }
 
     if (enemyCard.hp <= 0) {
       activeEnemyCardIndex.value++
-      if (activeEnemyCardIndex.value >= enemyDeck.value.length) {
+      if (activeEnemyCardIndex.value < enemyDeck.value.length) {
+        renderScene()
+      } else {
         enemyHealth.value -= playerCard.damage
       }
     }
 
-    renderScene()
-
-    if (playerHP.value > 0 || enemyHP.value > 0) {
+    // Следующий раунд
+    if (playerHP.value > 0 && enemyHP.value > 0) {
       performBattle()
     } else {
       isBattleActive.value = false
